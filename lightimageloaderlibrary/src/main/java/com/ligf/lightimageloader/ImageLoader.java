@@ -21,4 +21,5 @@ public class ImageLoader {
         }
         return  mInstance;
     }
+
 }
