@@ -76,9 +76,8 @@ public class ImageLoaderConfiguration {
             }
 
             if (this.diskCache == null){
-                this.diskCache = new BaseDiskCache(FileUtil.getDefCacheDirectory(context));
+                this.diskCache = new BaseDiskCache(FileUtil.getExternalFilesDir(context,"CacheImage"));
             }
         }
-
     }
 }
