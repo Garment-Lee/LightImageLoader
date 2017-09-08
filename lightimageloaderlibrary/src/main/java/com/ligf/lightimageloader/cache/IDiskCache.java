@@ -14,7 +14,7 @@ public interface IDiskCache {
 
     public File getDirectory();
 
-    public Bitmap get(String imageUri);
+    public File get(String imageUri);
 
     public void save(String imageUri, InputStream inputStream) throws FileNotFoundException;
 

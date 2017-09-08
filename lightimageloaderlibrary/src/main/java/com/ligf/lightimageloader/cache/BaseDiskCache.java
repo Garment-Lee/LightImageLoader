@@ -1,7 +1,6 @@
 package com.ligf.lightimageloader.cache;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -38,13 +37,13 @@ public class BaseDiskCache implements IDiskCache {
     }
 
     @Override
-    public Bitmap get(String imageUri) {
+    public File get(String imageUri) {
         File imageFile = new File(mCacheDirectory, mFileNameGenerator.getFileName(imageUri));
-        if (imageFile.exists()) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
-            return bitmap;
-        }
-        return null;
+//        if (imageFile.exists()) {
+//            Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+//            return bitmap;
+//        }
+        return imageFile;
     }
 
     @Override

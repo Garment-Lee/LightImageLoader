@@ -11,7 +11,10 @@ import com.ligf.lightimageloader.cache.IMemoryCache;
 import com.ligf.lightimageloader.cache.LruMemoryCache;
 import com.ligf.lightimageloader.utils.FileUtil;
 
+import java.util.concurrent.Executor;
+
 /**
+ * 图片加载配置器
  * Created by ligf on 2017/8/21.
  */
 public class ImageLoaderConfiguration {
@@ -32,11 +35,20 @@ public class ImageLoaderConfiguration {
 
         private Context context = null;
 
+        /**图片文件名生成器*/
         private IFileNameGenerator fileNameGenerator = null;
 
+        /**内存缓存*/
         private IMemoryCache memoryCache = null;
 
+        /**磁盘缓存*/
         private IDiskCache diskCache = null;
+
+        /**用于加载网络图片的线程池*/
+        private Executor loadNetWorkCacheImageExecutor = null;
+
+        /**用于加载文件缓存图片的线程池*/
+        private Executor loadCacheImageExecutor = null;
 
         public Builder(Context context){
             this.context = context.getApplicationContext();
@@ -54,6 +66,16 @@ public class ImageLoaderConfiguration {
 
         public Builder setDisCache(IDiskCache disCache){
             this.diskCache = disCache;
+            return this;
+        }
+
+        public Builder setLoadNetWorkCacheImageExecutor(Executor loadNetWorkCacheImageExecutor){
+            this.loadNetWorkCacheImageExecutor = loadNetWorkCacheImageExecutor;
+            return  this;
+        }
+
+        public Builder setLoadCacheImageExecutor(Executor loadCacheImageExecutor){
+            this.loadCacheImageExecutor = loadCacheImageExecutor;
             return this;
         }
 
