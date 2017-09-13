@@ -42,6 +42,7 @@ public class LoadingImageTask implements Runnable {
 
     @Override
     public void run() {
+        //获取
         File imageFile = mImageLoaderConfiguration.mDiskCache.get(mUri);
         Bitmap bitmap = null;
         if (imageFile != null && imageFile.exists()) {
@@ -114,11 +115,19 @@ public class LoadingImageTask implements Runnable {
         return -1;
     }
 
+    /**
+     * 获取对应uri的输入流
+     * @param uri
+     * @return
+     * @throws IOException
+     */
     private InputStream getInputStreamFromNetWork(String uri) throws IOException {
         HttpURLConnection connection = getConnection(uri);
         int connectCount = 0;
+        //请求失败，进行重连
         while (connection.getResponseCode() != 200 && connectCount < DEFAULT_MAX_CONNECT_COUNT){
             connection = getConnection(uri);
+            connectCount ++;
         }
         InputStream inputStream = connection.getInputStream();
         return inputStream;

@@ -28,10 +28,9 @@ public class LruMemoryCache implements IMemoryCache{
     public boolean put(String key, Bitmap value) {
         if (key != null && value != null){
             synchronized (this){
-                mCacheSize += sizeof(value);
                 Bitmap previous = mCacheMap.put(key, value);
-                if (previous != null){
-                    mCacheSize -= sizeof(previous);
+                if (previous == null){
+                    mCacheSize += sizeof(previous);
                 }
             }
         }
@@ -81,7 +80,6 @@ public class LruMemoryCache implements IMemoryCache{
                 mCacheMap.remove(key);
                 mCacheSize -= sizeof(value);
             }
-
         }
     }
 
