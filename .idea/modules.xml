@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/LightImageLoader.iml" filepath="$PROJECT_DIR$/LightImageLoader.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/lightimageloaderlibrary/lightimageloaderlib.iml" filepath="$PROJECT_DIR$/lightimageloaderlibrary/lightimageloaderlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lightimageloaderlibrary/lightimageloaderlibrary.iml" filepath="$PROJECT_DIR$/lightimageloaderlibrary/lightimageloaderlibrary.iml" />
     </modules>
   </component>
 </project>

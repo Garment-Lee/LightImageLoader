@@ -11,7 +11,8 @@ import com.ligf.lightimageloader.cache.IMemoryCache;
 import com.ligf.lightimageloader.cache.LruMemoryCache;
 import com.ligf.lightimageloader.utils.FileUtil;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 图片加载配置器
@@ -19,16 +20,22 @@ import java.util.concurrent.Executor;
  */
 public class ImageLoaderConfiguration {
 
-    private IFileNameGenerator mFileNameGenerator = null;
+    public IFileNameGenerator mFileNameGenerator = null;
 
-    private IMemoryCache mMemoryCache = null;
+    public IMemoryCache mMemoryCache = null;
 
-    private IDiskCache mDiskCache = null;
+    public IDiskCache mDiskCache = null;
+
+    public ExecutorService mLoadNetWorkCacheImageExecutor = null;
+
+    public ExecutorService mLoadCacheImageExecutor = null;
 
     private ImageLoaderConfiguration(Builder builder){
         mFileNameGenerator = builder.fileNameGenerator ;
         mMemoryCache = builder.memoryCache;
         mDiskCache = builder.diskCache;
+        mLoadCacheImageExecutor = builder.loadCacheImageExecutor;
+        mLoadNetWorkCacheImageExecutor = builder.loadNetWorkCacheImageExecutor;
     }
 
     public static class Builder{
@@ -45,10 +52,10 @@ public class ImageLoaderConfiguration {
         private IDiskCache diskCache = null;
 
         /**用于加载网络图片的线程池*/
-        private Executor loadNetWorkCacheImageExecutor = null;
+        private ExecutorService loadNetWorkCacheImageExecutor = null;
 
         /**用于加载文件缓存图片的线程池*/
-        private Executor loadCacheImageExecutor = null;
+        private ExecutorService loadCacheImageExecutor = null;
 
         public Builder(Context context){
             this.context = context.getApplicationContext();
@@ -69,12 +76,12 @@ public class ImageLoaderConfiguration {
             return this;
         }
 
-        public Builder setLoadNetWorkCacheImageExecutor(Executor loadNetWorkCacheImageExecutor){
+        public Builder setLoadNetWorkCacheImageExecutor(ExecutorService loadNetWorkCacheImageExecutor){
             this.loadNetWorkCacheImageExecutor = loadNetWorkCacheImageExecutor;
             return  this;
         }
 
-        public Builder setLoadCacheImageExecutor(Executor loadCacheImageExecutor){
+        public Builder setLoadCacheImageExecutor(ExecutorService loadCacheImageExecutor){
             this.loadCacheImageExecutor = loadCacheImageExecutor;
             return this;
         }
@@ -99,6 +106,14 @@ public class ImageLoaderConfiguration {
 
             if (this.diskCache == null){
                 this.diskCache = new BaseDiskCache(FileUtil.getExternalFilesDir(context,"CacheImage"));
+            }
+
+            if (this.loadCacheImageExecutor == null){
+                loadCacheImageExecutor = Executors.newCachedThreadPool();
+            }
+
+            if (this.loadNetWorkCacheImageExecutor == null){
+                loadNetWorkCacheImageExecutor = Executors.newCachedThreadPool();
             }
         }
     }
