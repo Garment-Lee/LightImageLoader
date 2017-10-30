@@ -6,6 +6,7 @@ import android.os.Handler;
 import com.ligf.lightimageloader.listener.OnLoadingListener;
 import com.ligf.lightimageloader.listener.SimpleImageLoadingListener;
 import com.ligf.lightimageloader.service.LoadingImageTask;
+import com.ligf.lightimageloader.utils.ImageUtil;
 
 /**
  * Created by ligf on 2017/8/21.
@@ -18,48 +19,76 @@ public class ImageLoader {
 
     private OnLoadingListener mDefaultLoadingListener = new SimpleImageLoadingListener();
 
-    private ImageLoader(){
+    private ImageLoader() {
 
     }
 
-    public static ImageLoader getInstance(){
-        if (mInstance == null){
-            synchronized (ImageLoader.class){
-                if (mInstance == null){
+    public static ImageLoader getInstance() {
+        if (mInstance == null) {
+            synchronized (ImageLoader.class) {
+                if (mInstance == null) {
                     mInstance = new ImageLoader();
                 }
             }
         }
-        return  mInstance;
+        return mInstance;
     }
 
     /**
      * 初始化ImageLoader配置参数
+     *
      * @param imageLoaderConfiguration
      */
-    public void init(ImageLoaderConfiguration imageLoaderConfiguration){
+    public void init(ImageLoaderConfiguration imageLoaderConfiguration) {
         this.mImageLoaderConfiguratiion = imageLoaderConfiguration;
         mImageLoaderManager = new ImageLoaderManager(imageLoaderConfiguration);
     }
 
     /**
-     *加载图片
-     * @param uri 图片Uri
+     * 加载图片,返回的是原图的大小
+     *
+     * @param uri             图片Uri
      * @param loadingListener 加载回调监听器
      */
-    public void loadImage(String uri, OnLoadingListener loadingListener){
-        if (loadingListener == null){
+    public void loadImage(String uri, OnLoadingListener loadingListener) {
+        if (loadingListener == null) {
             loadingListener = mDefaultLoadingListener;
         }
-        //开始加载图片回调
+        //开始加载图片的回调
         loadingListener.onLoadingStarted(uri);
-        //获取内存缓存图片
+        //获取内存缓存中的图片
         Bitmap cacheBitmap = mImageLoaderConfiguratiion.mMemoryCache.get(uri);
-        if (cacheBitmap == null){
-            LoadingImageTask loadingImageTask = new LoadingImageTask(uri, mImageLoaderConfiguratiion, loadingListener, new Handler());
+        if (cacheBitmap == null) {
+            LoadingImageTask loadingImageTask = new LoadingImageTask(uri, mImageLoaderConfiguratiion, loadingListener, new Handler(), null);
             mImageLoaderManager.submit(loadingImageTask);
         } else {
             loadingListener.onLoadingSucceeded(uri, cacheBitmap);
+        }
+    }
+
+    /**
+     * 加载图片，可以设置返回图片的大小
+     * @param uri
+     * @param loadingListener
+     * @param imageLoadingOption
+     */
+    public void loadImage(String uri, OnLoadingListener loadingListener, ImageLoadingOption imageLoadingOption) {
+        if (loadingListener == null) {
+            loadingListener = mDefaultLoadingListener;
+        }
+        //开始加载图片的回调
+        loadingListener.onLoadingStarted(uri);
+        //获取内存缓存中的图片
+        Bitmap cacheBitmap = mImageLoaderConfiguratiion.mMemoryCache.get(uri);
+        if (cacheBitmap == null) {
+            LoadingImageTask loadingImageTask = new LoadingImageTask(uri, mImageLoaderConfiguratiion, loadingListener, new Handler(), null);
+            mImageLoaderManager.submit(loadingImageTask);
+        } else {
+            //如果有传入图片大小的配置，则返回对应大小的图片
+            //但是缓存中还是缓存原图大小的图片
+            if (imageLoadingOption != null && imageLoadingOption.imageSize != null) {
+                loadingListener.onLoadingSucceeded(uri, ImageUtil.resizeImageByMatrix(cacheBitmap, imageLoadingOption.imageSize.width, imageLoadingOption.imageSize.height));
+            }
         }
     }
 

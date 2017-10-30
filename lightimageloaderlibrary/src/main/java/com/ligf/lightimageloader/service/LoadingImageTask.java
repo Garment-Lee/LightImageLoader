@@ -5,7 +5,9 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 
 import com.ligf.lightimageloader.ImageLoaderConfiguration;
+import com.ligf.lightimageloader.ImageLoadingOption;
 import com.ligf.lightimageloader.listener.OnLoadingListener;
+import com.ligf.lightimageloader.utils.ImageUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +27,8 @@ public class LoadingImageTask implements Runnable {
     public OnLoadingListener mOnLoadingListener = null;
     public Handler mHandler = null;
     public ImageLoaderConfiguration mImageLoaderConfiguration = null;
+    /**图片加载属性*/
+    public ImageLoadingOption mImageLoadingOption = null;
 
     public static final int HTTP_TYPE = 1;
     public static final int FILE_TYPE = 2;
@@ -36,16 +40,17 @@ public class LoadingImageTask implements Runnable {
     /**网络请求重连次数*/
     public static final int DEFAULT_MAX_CONNECT_COUNT = 5;
 
-    public LoadingImageTask(String uri, ImageLoaderConfiguration imageLoaderConfiguration, OnLoadingListener onLoadingListener, Handler handler) {
+    public LoadingImageTask(String uri, ImageLoaderConfiguration imageLoaderConfiguration, OnLoadingListener onLoadingListener, Handler handler, ImageLoadingOption imageLoadingOption) {
         this.mUri = uri;
         mOnLoadingListener = onLoadingListener;
         mHandler = handler;
         mImageLoaderConfiguration = imageLoaderConfiguration;
+        mImageLoadingOption = imageLoadingOption;
     }
 
     @Override
     public void run() {
-        //获取
+        //获取文件缓存图片
         File imageFile = mImageLoaderConfiguration.mDiskCache.get(mUri);
         Bitmap bitmap = null;
         if (imageFile != null && imageFile.exists()) {
@@ -73,7 +78,13 @@ public class LoadingImageTask implements Runnable {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    mOnLoadingListener.onLoadingSucceeded(mUri, finalBitmap);
+                    //如果有传入图片大小的配置，则返回对应大小的图片
+                    //但是缓存中还是缓存原图大小的图片
+                    if (mImageLoadingOption != null && mImageLoadingOption.imageSize != null){
+                        mOnLoadingListener.onLoadingSucceeded(mUri, ImageUtil.resizeImageByMatrix(finalBitmap, mImageLoadingOption.imageSize.width, mImageLoadingOption.imageSize.height));
+                    } else {
+                        mOnLoadingListener.onLoadingSucceeded(mUri, finalBitmap);
+                    }
                 }
             });
         } else {
