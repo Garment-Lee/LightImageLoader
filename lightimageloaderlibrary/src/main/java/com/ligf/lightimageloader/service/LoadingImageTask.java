@@ -8,6 +8,8 @@ import com.ligf.lightimageloader.ImageLoaderConfiguration;
 import com.ligf.lightimageloader.listener.OnLoadingListener;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -25,6 +27,7 @@ public class LoadingImageTask implements Runnable {
     public ImageLoaderConfiguration mImageLoaderConfiguration = null;
 
     public static final int HTTP_TYPE = 1;
+    public static final int FILE_TYPE = 2;
 //    public static final String
 
     public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 5 * 1000; // milliseconds
@@ -96,6 +99,9 @@ public class LoadingImageTask implements Runnable {
             case HTTP_TYPE:
                 getInputStreamFromNetWork(uri);
                 break;
+            case FILE_TYPE:
+                getInputStreamFromFile(uri);
+                break;
             default:
 
                 break;
@@ -111,6 +117,8 @@ public class LoadingImageTask implements Runnable {
     private int getUriType(String uri) {
         if (uri.startsWith("http") || uri.startsWith("https")) {
             return HTTP_TYPE;
+        } else if (uri.startsWith("file://")){
+            return FILE_TYPE;
         }
         return -1;
     }
@@ -130,6 +138,25 @@ public class LoadingImageTask implements Runnable {
             connectCount ++;
         }
         InputStream inputStream = connection.getInputStream();
+        return inputStream;
+    }
+
+    /**
+     * 获取对应Uri的文件输入流
+     * @param uri
+     * @return
+     */
+    private InputStream getInputStreamFromFile(String uri){
+        String imageUri = uri.substring("file://".length());
+        File imageFile = new File(uri);
+        InputStream inputStream = null;
+        if (imageFile.exists()){
+            try {
+                inputStream = new FileInputStream(imageUri);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         return inputStream;
     }
 
