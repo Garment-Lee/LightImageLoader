@@ -5,30 +5,33 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 
 import com.ligf.lightimageloader.ImageLoaderConfiguration;
-import com.ligf.lightimageloader.ImageLoadingOption;
+import com.ligf.lightimageloader.ImageProcessOption;
+import com.ligf.lightimageloader.ImageProcessor;
 import com.ligf.lightimageloader.listener.OnLoadingListener;
-import com.ligf.lightimageloader.utils.ImageUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * 图片加载任务类
+ * 图片加载任务类<p>
+ * 使用HttpUrlConnection进行网络请求<p>
  * Created by ligf on 2017/9/12.
  */
 public class LoadingImageTask implements Runnable {
 
     public String mUri = null;
     public OnLoadingListener mOnLoadingListener = null;
+    /** 用于调用回调监听器的Handler对象 */
     public Handler mHandler = null;
     public ImageLoaderConfiguration mImageLoaderConfiguration = null;
     /**图片加载属性*/
-    public ImageLoadingOption mImageLoadingOption = null;
+    public ImageProcessOption mImageLoadingOption = null;
 
     public static final int HTTP_TYPE = 1;
     public static final int FILE_TYPE = 2;
@@ -40,7 +43,7 @@ public class LoadingImageTask implements Runnable {
     /**网络请求重连次数*/
     public static final int DEFAULT_MAX_CONNECT_COUNT = 5;
 
-    public LoadingImageTask(String uri, ImageLoaderConfiguration imageLoaderConfiguration, OnLoadingListener onLoadingListener, Handler handler, ImageLoadingOption imageLoadingOption) {
+    public LoadingImageTask(String uri, ImageLoaderConfiguration imageLoaderConfiguration, OnLoadingListener onLoadingListener, Handler handler, ImageProcessOption imageLoadingOption) {
         this.mUri = uri;
         mOnLoadingListener = onLoadingListener;
         mHandler = handler;
@@ -56,7 +59,8 @@ public class LoadingImageTask implements Runnable {
         if (imageFile != null && imageFile.exists()) {
             bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
             if (bitmap != null){
-                mImageLoaderConfiguration.mMemoryCache.put(mUri, bitmap);
+                SoftReference<Bitmap> softReference = new SoftReference<Bitmap>(bitmap);
+                mImageLoaderConfiguration.mMemoryCache.put(mUri, softReference);
             }
         } else {
             try {
@@ -65,7 +69,8 @@ public class LoadingImageTask implements Runnable {
                     bitmap = BitmapFactory.decodeStream(inputStream);
                 }
                 if (bitmap != null){
-                    mImageLoaderConfiguration.mMemoryCache.put(mUri, bitmap);
+                    SoftReference<Bitmap> softReference = new SoftReference<Bitmap>(bitmap);
+                    mImageLoaderConfiguration.mMemoryCache.put(mUri, softReference);
                     mImageLoaderConfiguration.mDiskCache.save(mUri, bitmap);
                 }
             } catch (IOException e) {
@@ -78,10 +83,11 @@ public class LoadingImageTask implements Runnable {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    //如果有传入图片大小的配置，则返回对应大小的图片
+                    //如果有传入图片处理配置，则进行图片处理
                     //但是缓存中还是缓存原图大小的图片
-                    if (mImageLoadingOption != null && mImageLoadingOption.imageSize != null){
-                        mOnLoadingListener.onLoadingSucceeded(mUri, ImageUtil.resizeImageByMatrix(finalBitmap, mImageLoadingOption.imageSize.width, mImageLoadingOption.imageSize.height));
+                    if (mImageLoadingOption != null){
+                        ImageProcessor imageProcessor = new ImageProcessor(mImageLoadingOption);
+                        mOnLoadingListener.onLoadingSucceeded(mUri, imageProcessor.process(finalBitmap));
                     } else {
                         mOnLoadingListener.onLoadingSucceeded(mUri, finalBitmap);
                     }

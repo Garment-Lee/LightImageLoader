@@ -103,7 +103,7 @@ public class FileUtil {
     }
 
     /**
-     * 根据文件父目录路径和文件名称创建新的文件
+     * 根据文件父目录路径和文件名创建新的文件
      * @param parentFileDirPath 文件父目录路径名称
      * @param fileName 文件名称
      * @return

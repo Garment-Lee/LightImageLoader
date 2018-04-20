@@ -11,11 +11,12 @@ import com.ligf.lightimageloader.cache.IMemoryCache;
 import com.ligf.lightimageloader.cache.LruMemoryCache;
 import com.ligf.lightimageloader.utils.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * 图片加载配置器
+ * 图片加载配置器（包括内存缓存、文件缓存、图片文件名的生成器、加载缓存图片线程池、加载网络图片线程池等）
  * Created by ligf on 2017/8/21.
  */
 public class ImageLoaderConfiguration {
@@ -26,6 +27,8 @@ public class ImageLoaderConfiguration {
 
     public IDiskCache mDiskCache = null;
 
+    public File mCacheDir = null;
+
     public ExecutorService mLoadNetWorkCacheImageExecutor = null;
 
     public ExecutorService mLoadCacheImageExecutor = null;
@@ -34,6 +37,7 @@ public class ImageLoaderConfiguration {
         mFileNameGenerator = builder.fileNameGenerator ;
         mMemoryCache = builder.memoryCache;
         mDiskCache = builder.diskCache;
+        mCacheDir = builder.cacheDir;
         mLoadCacheImageExecutor = builder.loadCacheImageExecutor;
         mLoadNetWorkCacheImageExecutor = builder.loadNetWorkCacheImageExecutor;
     }
@@ -50,6 +54,9 @@ public class ImageLoaderConfiguration {
 
         /**磁盘缓存*/
         private IDiskCache diskCache = null;
+
+        /**文件缓存路径*/
+        private File cacheDir = null;
 
         /**用于加载网络图片的线程池*/
         private ExecutorService loadNetWorkCacheImageExecutor = null;
@@ -73,6 +80,11 @@ public class ImageLoaderConfiguration {
 
         public Builder setDisCache(IDiskCache disCache){
             this.diskCache = disCache;
+            return this;
+        }
+
+        public Builder setCacheDir(File cacheDir){
+            this.cacheDir = cacheDir;
             return this;
         }
 
@@ -105,7 +117,11 @@ public class ImageLoaderConfiguration {
             }
 
             if (this.diskCache == null){
-                this.diskCache = new BaseDiskCache(FileUtil.getExternalFilesDir(context,"CacheImage"));
+                this.diskCache = new BaseDiskCache();
+            }
+
+            if (this.cacheDir == null){
+                this.cacheDir = FileUtil.getExternalFilesDir(context,"CacheImage");
             }
 
             if (this.loadCacheImageExecutor == null){
@@ -115,6 +131,8 @@ public class ImageLoaderConfiguration {
             if (this.loadNetWorkCacheImageExecutor == null){
                 loadNetWorkCacheImageExecutor = Executors.newCachedThreadPool();
             }
+            diskCache.setCacheDirectory(cacheDir);
+            diskCache.setFileNameGenerator(fileNameGenerator);
         }
     }
 }

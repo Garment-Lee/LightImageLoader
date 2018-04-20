@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
  * 网络图片的加载任务添加到mLoadNetWorkCacheImageExecutor线程池中，文件缓存的图片加载任务添加到mLoadCacheImageExecutor线程池中
  * Created by ligf on 2017/9/8.
  */
-public class ImageLoaderManager {
+public class ImageLoaderTaskManager {
 
     private ImageLoaderConfiguration mImageLoaderConfiguration = null;
 
@@ -18,7 +18,7 @@ public class ImageLoaderManager {
 
     private ExecutorService mLoadCacheImageExecutor = null;
 
-    public ImageLoaderManager(ImageLoaderConfiguration imageLoaderConfiguration){
+    public ImageLoaderTaskManager(ImageLoaderConfiguration imageLoaderConfiguration){
         mImageLoaderConfiguration = imageLoaderConfiguration;
         mLoadCacheImageExecutor = imageLoaderConfiguration.mLoadCacheImageExecutor;
         mLoadNetWorkCacheImageExecutor = imageLoaderConfiguration.mLoadNetWorkCacheImageExecutor;
@@ -37,4 +37,6 @@ public class ImageLoaderManager {
             mLoadNetWorkCacheImageExecutor.execute(loadingImageTask);
         }
     }
+
+
 }

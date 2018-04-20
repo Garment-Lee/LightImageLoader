@@ -5,7 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -119,7 +122,7 @@ public class ImageUtil {
     /**
      * 获取图片的类型<p>
      * options.outMimeType获取图片的格式，"image/png"、"image/jpeg"、"image/gif"
-     * @param bitmapPath
+     * @param bitmapPath 图片的路径
      * @return
      */
     public static String getBitmapType(String bitmapPath){
@@ -176,5 +179,25 @@ public class ImageUtil {
         Bitmap scaleBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
         return  scaleBitmap;
     }
+
+    /**
+     * 创建一个圆形的图片
+     * @param source
+     * @return
+     */
+    public static Bitmap createCircleImage(Bitmap source) {
+        //截取长宽中较小的值，作为新图片的直径
+        int length = source.getWidth() < source.getHeight() ? source.getWidth() : source.getHeight();
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        Bitmap target = Bitmap.createBitmap(length, length, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(target);
+        canvas.drawCircle(length / 2, length / 2, length / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(source, 0, 0, paint);
+        return target;
+    }
+
+
 
 }

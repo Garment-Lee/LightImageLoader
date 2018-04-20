@@ -19,4 +19,8 @@ public interface IDiskCache {
     public void save(String imageUri, InputStream inputStream) throws FileNotFoundException;
 
     public void save(String imageUri, Bitmap bitmap) throws IOException;
+
+    public void setCacheDirectory(File cacheDirectory);
+
+    public void setFileNameGenerator(IFileNameGenerator fileNameGenerator);
 }
