@@ -10,4 +10,9 @@ public class ImageSize {
     public int width;
     /**图片的高度*/
     public int height;
+
+    public ImageSize(int width, int height){
+        this.width = width;
+        this.height = height;
+    }
 }
