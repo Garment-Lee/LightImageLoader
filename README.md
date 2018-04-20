@@ -9,7 +9,9 @@
 * 加载指定大小的图片以及图片的形状。
 * 图片加载过程的监听回调。
 
-## 应用结构
+## 应用结构设计
+
+![](https://github.com/Garment-Lee/LightImageLoader/raw/master/imgs/lightimageloader_architecture.png)  
 
 
 ## 用法
