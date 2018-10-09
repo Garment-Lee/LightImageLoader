@@ -16,7 +16,12 @@
 
 ![](https://github.com/Garment-Lee/LightImageLoader/raw/master/imgs/lightimageloader_architecture_1.png)  
 
+## 引用
+gradle：
+```java
+compile 'com.ligf:lightimageloader:1.0.0'
 
+```
 
 
 ## 用法
